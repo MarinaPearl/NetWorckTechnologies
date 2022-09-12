@@ -1,44 +1,45 @@
 package nsu.Demchuck.lab1;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
+import java.net.*;
+import java.util.HashMap;
+import java.util.UUID;
 
 public class Receiver extends Thread {
-    private DatagramSocket socket;
+    private MulticastSocket socket;
     private boolean running;
-    private byte[] buf = new byte[256];
-    public final static int SERVICE_PORT=8080;
-    public Receiver() throws SocketException {
-        socket = new DatagramSocket(SERVICE_PORT);
+    private byte[] buf = new byte[1024];
+    public final static int SERVICE_PORT = 8000;
+    private HashMap<UUID, InetAddress> list;
+    private Checker checker;
+    public Receiver() throws IOException {
+        socket = new MulticastSocket(SERVICE_PORT);
+        socket.setSoTimeout(100);
+        socket.joinGroup(InetAddress.getByName("224.1.1.1"));
+        checker = new Checker();
     }
 
+    //@Override
     public void run() {
         running = true;
-       // while (running) {
-        System.out.println("hello");
-            DatagramPacket packet =
-                    new DatagramPacket(buf, buf.length);
-        System.out.println("7789");
-            try {
-                socket.receive(packet);
-                System.out.println("123456");
-                InetAddress address = packet.getAddress();
-                int port = packet.getPort();
-                System.out.println("111");
-                packet = new DatagramPacket(buf, buf.length, address, port);
-                String received = new String(packet.getData(), 0, packet.getLength());
-//                if (received.equals("end")) {
-//                    running = false;
-//                    continue;
-//                }
-                System.out.println(received);
-                socket.send(packet);
-            } catch (IOException e) {
-                e.printStackTrace();
+        // while (running) {
+        DatagramPacket packet =
+                new DatagramPacket(buf, buf.length);
+        try {
+            socket.receive(packet);
+            UUID uid = UuidUtils.asUuid(packet.getData());
+            if(!checker.checkClients(uid)) {
+                checker.putInListClients(uid, packet.getAddress());
+                list = checker.getListClients();
+                if (list.isEmpty()) {
+                    for (InetAddress ip : list.values()) {
+                        System.out.println("ip :" + ip);
+                    }
+                }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         //}
         socket.close();
     }

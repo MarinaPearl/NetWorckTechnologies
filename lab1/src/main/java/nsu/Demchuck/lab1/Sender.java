@@ -2,36 +2,29 @@ package nsu.Demchuck.lab1;
 
 import java.io.IOException;
 import java.net.*;
+import java.util.UUID;
 
-public class Sender extends Thread{
-       private DatagramSocket socket;
-       private DatagramPacket packet;
-       private final static int SERVICE_PORT = 8080;
-       public Sender() throws SocketException {
-           socket = new DatagramSocket();
-       }
-       public void run() {
-           try {
-               System.out.println("212");
-               InetAddress address = InetAddress.getByName("localhost");
-               byte[] sendingDataBuffer = new byte[1024];
-               byte[] receiveDataBuffer = new byte[1024];
-               String sentence = "Hello from UDP client";
-               sendingDataBuffer = sentence.getBytes();
-               System.out.println("000");
-               DatagramPacket packet = new DatagramPacket(sendingDataBuffer,
-                       sendingDataBuffer.length, address, SERVICE_PORT);
-               System.out.println("131");
-               socket.send(packet);
-               System.out.println("222");
-             //  packet = new DatagramPacket(receiveDataBuffer, receiveDataBuffer.length);
-              // socket.receive(packet);
-               //String string = new String(packet.getData());
-              // System.out.println(string);
-               socket.close();
+public class Sender extends Thread {
+    private MulticastSocket socket;
+    private final static int SERVICE_PORT = 8000;
 
-           } catch (IOException e) {
-               e.printStackTrace();
-           }
-       }
+    public Sender() throws IOException {
+        socket = new MulticastSocket(SERVICE_PORT);
+    }
+
+    // @Override
+    public void run() {
+        try {
+            byte[] sendingDataBuffer;
+            UUID uid = UUID.randomUUID();
+            sendingDataBuffer = UuidUtils.asBytes(uid);
+            DatagramPacket packet = new DatagramPacket(sendingDataBuffer,
+                    sendingDataBuffer.length, InetAddress.getByName("224.1.1.1"), SERVICE_PORT);
+            socket.send(packet);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            socket.close();
+        }
+    }
 }

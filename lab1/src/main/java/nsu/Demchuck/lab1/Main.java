@@ -6,11 +6,10 @@ public class Main {
     public static void main(String args[]) {
            try {
                Sender sender = new Sender();
-               System.out.println("cuyc");
-               System.out.println("868");
-               sender.run();
                Receiver receiver = new Receiver();
-               receiver.run();
+               sender.start();
+               receiver.start();
+
 
            }catch (IOException error) {
                error.printStackTrace();
