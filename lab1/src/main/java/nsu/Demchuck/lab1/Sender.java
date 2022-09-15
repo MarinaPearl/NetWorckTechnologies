@@ -9,6 +9,7 @@ public class Sender extends Thread {
     private final static int SERVICE_PORT = 8000;
 
     public Sender() throws IOException {
+       // socket.setSoTimeout(1000);
         socket = new MulticastSocket(SERVICE_PORT);
     }
 
@@ -20,8 +21,11 @@ public class Sender extends Thread {
             sendingDataBuffer = UuidUtils.asBytes(uid);
             DatagramPacket packet = new DatagramPacket(sendingDataBuffer,
                     sendingDataBuffer.length, InetAddress.getByName("224.1.1.1"), SERVICE_PORT);
-            socket.send(packet);
-        } catch (IOException e) {
+            while (true) {
+                socket.send(packet);
+                Thread.sleep(500);
+            }
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         } finally {
             socket.close();
