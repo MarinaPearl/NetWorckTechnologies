@@ -83,6 +83,7 @@ public class Package implements Runnable {
                     break;
                 }
                 fileWriter.write(str);
+                fileWriter.write("\n");
                 fileWriter.flush();
                 //System.out.println(str);
             }

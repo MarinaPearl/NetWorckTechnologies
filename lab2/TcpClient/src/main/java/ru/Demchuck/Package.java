@@ -3,16 +3,15 @@ package ru.Demchuck;
 import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 public class Package {
     private DataInputStream dataInputStream;
     private DataOutputStream dataOutputStream;
     private String nameFile;
     private long sizeFile;
-    File file;
-    Socket socket;
+    private File file;
+    private Socket socket;
+
     public Package(Socket socket) {
         try {
             this.socket = socket;
@@ -34,7 +33,6 @@ public class Package {
         } catch (IOException error) {
             error.printStackTrace();
         }
-        //FileReader fileReader = new FileReader(file);
     }
 
     public void sendSizeFile() {
@@ -78,12 +76,13 @@ public class Package {
             error.printStackTrace();
         }
     }
+
     private void releaseResources() {
         try {
             socket.close();
             dataInputStream.close();
             dataOutputStream.close();
-        }catch (IOException error) {
+        } catch (IOException error) {
             error.printStackTrace();
         }
     }
